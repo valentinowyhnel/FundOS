@@ -18,14 +18,30 @@
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
-    "clean": "rm -rf dist .turbo"
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:firestore-seed": "tsx src/firestore-seed.ts"
   },
-  "dependencies": { "@prisma/client": "^6.9.0", "pg": "^8.16.0" },
-  "peerDependencies": {  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "pg": "^8.16.0",
+    "bcrypt": "^5.1.1",
+    "decimal.js": "^10.4.3",
+    "@google-cloud/firestore": "^7.11.0"
+  },
   "devDependencies": {
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.0", "prisma": "^6.9.0", "@types/pg": "^8.15.0"
+    "vitest": "^3.2.0",
+    "prisma": "^6.9.0",
+    "@types/pg": "^8.15.0",
+    "@types/bcrypt": "^5.0.2",
+    "tsx": "^4.19.0"
   }
 }

@@ -18,14 +18,10 @@
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
-  "dependencies": {  },
-  "peerDependencies": {  },
   "devDependencies": {
     "tsup": "^8.5.0",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.0"
+    "typescript": "^5.8.3"
   }
 }
