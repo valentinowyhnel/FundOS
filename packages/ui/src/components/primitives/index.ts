@@ -1,5 +1,8 @@
-export * from './button';
-export * from './badge';
-export * from './card';
-export * from './input';
-// Add more primitives here as they are implemented
+export * from './Badge';
+export * from './Button';
+export * from './Card';
+export * from './Input';
+export * from './ProgressBar';
+export * from './Skeleton';
+export * from './Spinner';
+export * from './Toggle';

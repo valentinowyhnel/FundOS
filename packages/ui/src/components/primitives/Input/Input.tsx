@@ -3,7 +3,7 @@
  * Source of truth: FRONTEND_DESIGN_SYSTEM.md § 3.2 Form System
  */
 import * as React from 'react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 const inputBase = [
   'w-full rounded-md border border-[--color-border] bg-[--color-surface]',
