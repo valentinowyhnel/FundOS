@@ -1,6 +1,6 @@
 /**
- * FundOS Design System — Main Entry Point
- * Source of truth: FRONTEND_DESIGN_SYSTEM.md
+ * @fundos/design-system
+ * Main barrel — exports tokens and utilities.
+ * Import CSS separately in the consuming app.
  */
 export * from './tokens'
-export { default as fundosPreset } from './tailwind-preset'

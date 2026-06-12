@@ -1,22 +1,30 @@
 {
   "name": "@fundos/design-system",
   "version": "0.1.0",
-  "description": "FundOS design tokens, Tailwind preset and global CSS — derived from FRONTEND_DESIGN_SYSTEM.md",
+  "description": "FundOS design tokens, Tailwind preset, and global styles",
   "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./globals.css": "./src/globals.css",
-    "./tailwind-preset": "./src/tailwind-preset.ts"
+    "./tokens": "./src/tokens/index.ts",
+    "./tokens/colors": "./src/tokens/colors.ts",
+    "./tokens/typography": "./src/tokens/typography.ts",
+    "./tokens/spacing": "./src/tokens/spacing.ts",
+    "./tokens/radius": "./src/tokens/radius.ts",
+    "./tokens/shadows": "./src/tokens/shadows.ts",
+    "./tokens/motion": "./src/tokens/motion.ts",
+    "./tailwind/preset": "./src/tailwind/preset.ts",
+    "./styles/globals.css": "./src/styles/globals.css",
+    "./styles/dark.css": "./src/styles/dark.css"
   },
-  "files": ["src"],
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
+  "peerDependencies": {
+    "tailwindcss": ">=3.4.0"
+  },
   "devDependencies": {
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.4.0"
-  },
-  "peerDependencies": {
-    "tailwindcss": ">=3.0.0"
+    "typescript": "^5.0.0"
   }
 }
