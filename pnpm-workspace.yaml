@@ -1,0 +1,15 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+onlyBuiltDependencies:
+  - "@biomejs/biome"
+  - "@prisma/client"
+  - "@prisma/engines"
+  - "@sentry/cli"
+  - bcrypt
+  - esbuild
+  - msgpackr-extract
+  - prisma
+  - protobufjs
+  - sharp
