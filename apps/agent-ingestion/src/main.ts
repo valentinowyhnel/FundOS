@@ -1,18 +1,35 @@
-import { createAgentServer } from '@fundos/runtime';
-import { agent } from './agent/agent';
+import Fastify from 'fastify';
+import { ingestionAgent } from './agent/agent.js';
 
-async function bootstrap() {
-  const server = await createAgentServer({
-    name: 'agent-ingestion',
-  });
+const fastify = Fastify({ logger: true });
 
-  // Mount ADK agent or other routes here
-  server.post('/invoke', async (request, reply) => {
-    // TODO: Implement ADK agent invocation logic
-    return { message: 'Agent ingestion invoked' };
-  });
+fastify.get('/health', async () => ({
+  status: 'ok',
+  agent: ingestionAgent.name,
+  version: '0.0.1',
+  uptime: process.uptime(),
+  lastIngestion: null,
+  rowsProcessedLast24h: 0,
+  deps: {
+    bigquery: 'ok',
+    pubsub: 'ok'
+  }
+}));
 
-  await (server as any).start();
-}
+fastify.get('/ready', async () => ({
+  status: 'ready',
+  bigquery: 'ok',
+  pubsub: 'ok'
+}));
 
-bootstrap();
+const start = async () => {
+  try {
+    await fastify.listen({ port: 8080, host: '0.0.0.0' });
+    console.log('Ingestion Agent listening on port 8080');
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+start();

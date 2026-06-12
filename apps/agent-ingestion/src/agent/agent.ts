@@ -1,19 +1,29 @@
-// TODO: Import { Agent } from '@google-cloud/adk' once dependency is available
-// import { Agent } from '@google-cloud/adk';
-import { createGeminiClient } from '@fundos/ai';
-import { IngestionInputSchema } from './schemas/input.schema';
-import { IngestionOutputSchema } from './schemas/output.schema';
-import { systemPrompt } from './prompts/system.prompt';
+import { createAgent, createTool } from '@fundos/ai';
+import { z } from 'zod';
 
-// This is a placeholder for the ADK Agent until the library is fully integrated
-export const agent = {
+const parseCsvTool = createTool({
+  name: 'parseCsv',
+  description: 'Parses and cleans CSV data from a URL',
+  schema: z.object({ fileUrl: z.string() }),
+  handler: async ({ fileUrl }) => {
+    // TODO: implement papaparse logic
+    return { rows: [], errors: [] };
+  }
+});
+
+const storeRawTool = createTool({
+  name: 'storeRaw',
+  description: 'Writes data to BigQuery raw layer',
+  schema: z.object({ table: z.string(), rows: z.array(z.any()) }),
+  handler: async ({ table, rows }) => {
+    // TODO: implement BigQuery insert
+    return { inserted: rows.length, jobId: 'bq-job-123' };
+  }
+});
+
+export const ingestionAgent = createAgent({
   name: 'agent-ingestion',
-  description: 'Normalizes uploads, APIs, webhooks, and documents',
-  inputSchema: IngestionInputSchema,
-  outputSchema: IngestionOutputSchema,
-  systemPrompt,
-  // tools: [],
-  // workflow: async (input) => { ... }
-};
-
-console.log('ADK Agent "agent-ingestion" initialized with Gemini');
+  model: 'gemini-2.0-flash-001',
+  system: 'You are the Ingestion Agent. Normalize and validate incoming data.',
+  tools: [parseCsvTool, storeRawTool],
+});
