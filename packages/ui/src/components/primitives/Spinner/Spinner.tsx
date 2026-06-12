@@ -3,7 +3,7 @@
  * Source of truth: FRONTEND_DESIGN_SYSTEM.md § 3.8 Loading States
  */
 import * as React from 'react'
-import { cn } from '../../lib/utils'
+import { cn } from '../../../lib/utils'
 
 export interface SpinnerProps extends React.SVGAttributes<SVGElement> {
   size?: 'xs' | 'sm' | 'md' | 'lg'
@@ -28,30 +28,3 @@ export function Spinner({ size = 'md', className, ...props }: SpinnerProps) {
 }
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'text' | 'rect' | 'circle'
-  lines?: number
-}
-
-export function Skeleton({ variant = 'rect', lines = 1, className, ...props }: SkeletonProps) {
-  const base = 'animate-pulse bg-[--color-surface-3] rounded-md'
-
-  if (variant === 'text') {
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: lines }).map((_, i) => (
-          <div
-            key={i}
-            className={cn(base, 'h-4', i === lines - 1 && lines > 1 && 'w-4/5', className)}
-            {...props}
-          />
-        ))}
-      </div>
-    )
-  }
-
-  if (variant === 'circle') {
-    return <div className={cn(base, 'rounded-full w-10 h-10', className)} {...props} />
-  }
-
-  return <div className={cn(base, 'h-20', className)} {...props} />
-}
