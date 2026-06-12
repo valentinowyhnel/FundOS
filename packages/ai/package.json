@@ -21,8 +21,17 @@
     "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
-  "dependencies": { "@google-cloud/vertexai": "^1.10.0", "ai": "^4.3.0", "lru-cache": "^11.1.0", "openai": "^4.100.0", "p-limit": "^6.2.0", "p-retry": "^6.2.1", "zod": "^3.25.0" },
-  "peerDependencies": {  },
+  "dependencies": {
+    "@fundos/types": "workspace:*",
+    "@google-cloud/vertexai": "^1.10.0",
+    "ai": "^4.3.0",
+    "lru-cache": "^11.1.0",
+    "openai": "^4.100.0",
+    "p-limit": "^6.2.0",
+    "p-retry": "^6.2.1",
+    "zod": "^3.25.0",
+    "zod-to-json-schema": "^3.25.2"
+  },
   "devDependencies": {
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
