@@ -1,0 +1,27 @@
+/*
+ * FundOS Dark Mode Token Overrides
+ * Apply via data-theme="dark" on <html>
+ */
+[data-theme='dark'],
+.dark {
+  --color-bg:        #0D1117;
+  --color-surface:   #161B22;
+  --color-surface-2: #1C2128;
+  --color-surface-offset: #22272E;
+  --color-border:    #30363D;
+  --color-divider:   #21262D;
+
+  --color-ink:        #E6EDF3;
+  --color-text-muted: #8B949E;
+  --color-text-faint: #484F58;
+  --color-text-inverse: #0D1117;
+
+  --color-primary:         #3FBCB4;
+  --color-primary-hover:   #2EA89F;
+  --color-primary-active:  #1A8F87;
+  --color-primary-highlight: #1A3E3B;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+}

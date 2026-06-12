@@ -1,0 +1,132 @@
+/*
+ * FundOS Global Styles
+ * Source: FRONTEND_DESIGN_SYSTEM.md § Base Stylesheet
+ *
+ * Import in apps/web/src/app/globals.css:
+ *   @import '@fundos/design-system/styles/globals.css';
+ */
+
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&f[]=general-sans@400,500,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #101828;
+  background-color: #F7F9FC;
+}
+
+img, picture, video, canvas, svg { display: block; max-width: 100%; height: auto; }
+ul[role='list'], ol[role='list'] { list-style: none; }
+input, button, textarea, select { font: inherit; color: inherit; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Satoshi', 'General Sans', system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+p, li, figcaption { text-wrap: pretty; max-width: 72ch; }
+
+/* Tabular numbers for all financial figures */
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid #0F766E;
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+}
+
+/* Selection */
+::selection {
+  background: rgba(15, 118, 110, 0.15);
+  color: #101828;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+button { cursor: pointer; background: none; border: none; }
+table  { border-collapse: collapse; width: 100%; }
+
+a, button, [role='button'], input, textarea, select {
+  transition: color 200ms cubic-bezier(0.16,1,0.3,1),
+              background 200ms cubic-bezier(0.16,1,0.3,1),
+              border-color 200ms cubic-bezier(0.16,1,0.3,1),
+              box-shadow 200ms cubic-bezier(0.16,1,0.3,1),
+              opacity 200ms cubic-bezier(0.16,1,0.3,1);
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+}
+
+/* Shimmer skeleton loader */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #EBEEf3 25%, #F2F4F8 50%, #EBEEf3 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.25rem;
+}
+
+/* Confidence ring animation */
+@keyframes confidence-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+.confidence-pulse {
+  animation: confidence-pulse 2s ease-in-out infinite;
+}
+
+/* Fade-in for AI panels */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fade-in 300ms cubic-bezier(0.16,1,0.3,1) both; }
+
+/* Slide-in from right for drawers */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.slide-in-right { animation: slide-in-right 300ms cubic-bezier(0.16,1,0.3,1) both; }
+
+/* Number counter morph */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.count-up { animation: count-up 400ms cubic-bezier(0.175,0.885,0.32,1.275) both; }

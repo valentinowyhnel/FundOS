@@ -1,0 +1,463 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum UserRole {
+  FOUNDER
+  INVESTOR
+  ADMIN
+  COMPLIANCE
+}
+
+enum KycStatus {
+  NOT_STARTED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum InvestorTier {
+  RETAIL
+  ACCREDITED
+  QUALIFIED
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  FUNDED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentRail {
+  EUR_FIAT
+  USDC
+  POLYGON
+  ETHEREUM
+}
+
+enum InvestmentStatus {
+  PENDING
+  SETTLED
+  ESCROWED
+  CANCELLED
+  REFUNDED
+}
+
+enum DocumentType {
+  IDENTITY_PROOF
+  PROOF_OF_ADDRESS
+  KYB_EXTRACT
+  PITCH_DECK
+  FINANCIAL_FORECAST
+  INVESTMENT_AGREEMENT
+}
+
+enum NotificationLevel {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum NotificationChannel {
+  SSE
+  PUSH
+  EMAIL
+  SMS
+}
+
+// --- Models ---
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  role          UserRole  @default(INVESTOR)
+  firstName     String?
+  lastName      String?
+  avatarUrl     String?
+
+  // Compliance
+  kycStatus     KycStatus @default(NOT_STARTED)
+  kycReferenceId String?  @unique
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // Soft Delete
+
+  // Relations
+  sessions      UserSession[]
+  founderProfile Founder?
+  investorProfile Investor?
+  documents     Document[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  @@index([email])
+  @@index([role])
+  @@index([deletedAt])
+}
+
+model UserSession {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  deviceInfo Json?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Founder {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  companyName     String
+  companyRegNumber String  @unique
+  bio             String?
+  website         String?
+  trackRecord     Json?    // Previous exits, etc.
+  credibilityScore Float   @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id])
+  campaigns       Campaign[]
+}
+
+model Investor {
+  id              String       @id @default(uuid())
+  userId          String       @unique
+  tier            InvestorTier @default(RETAIL)
+  country         String
+  sectors         String[]     // Interests: fintech, AI, Web3, etc.
+  copilotMemory   Json?        // Preferences for AI copilot
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  user            User         @relation(fields: [userId], references: [id])
+  wallets         InvestorWallet[]
+  investments     Investment[]
+  watchlist       WatchlistItem[]
+  signals         SignalHistory[]
+
+  @@index([country])
+  @@index([tier])
+}
+
+model InvestorWallet {
+  id          String      @id @default(uuid())
+  investorId  String
+  rail        PaymentRail
+  address     String      // IBAN or Crypto Address
+  isVerified  Boolean     @default(false)
+  balance     Decimal     @default(0) @db.Decimal(20, 2)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  investor    Investor    @relation(fields: [investorId], references: [id])
+
+  @@unique([investorId, rail])
+}
+
+model Campaign {
+  id              String         @id @default(uuid())
+  founderId       String
+  title           String
+  slug            String         @unique
+  description     String
+  targetAmount    Decimal        @db.Decimal(20, 2)
+  raisedAmount    Decimal        @default(0) @db.Decimal(20, 2)
+  currency        String         @default("EUR")
+  status          CampaignStatus @default(DRAFT)
+  stage           String?        // Seed, Pre-Seed, Series A
+
+  // AI/Scoring
+  confidenceScore Float?
+  confidenceLevel String?        // Low, Moderate, Strong
+
+  // Tokenization
+  isTokenized     Boolean        @default(false)
+  tokenAddress    String?
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?      // Soft Delete
+
+  founder         Founder        @relation(fields: [founderId], references: [id])
+  updates         CampaignUpdate[]
+  investments     Investment[]
+  scoreHistory    ScoreHistory[]
+  watchlistItems  WatchlistItem[]
+  documents       Document[]
+
+  @@index([status, stage])
+  @@index([confidenceScore])
+  @@index([deletedAt])
+}
+
+model CampaignUpdate {
+  id          String   @id @default(uuid())
+  campaignId  String
+  title       String
+  content     String
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+model ScoreHistory {
+  id          String   @id @default(uuid())
+  campaignId  String
+  score       Float
+  dimension   String   // business, market, risk, readiness
+  reason      String?
+  traceId     String?
+  createdAt   DateTime @default(now())
+
+  campaign    Campaign @relation(fields: [campaignId], references: [id])
+
+  @@index([campaignId])
+}
+
+model SignalHistory {
+  id          String   @id @default(uuid())
+  investorId  String
+  type        String   // matching, interest, behavior
+  payload     Json
+  createdAt   DateTime @default(now())
+
+  investor    Investor @relation(fields: [investorId], references: [id])
+
+  @@index([investorId])
+}
+
+model Investment {
+  id              String           @id @default(uuid())
+  investorId      String
+  campaignId      String
+  amount          Decimal          @db.Decimal(20, 2)
+  rail            PaymentRail
+  status          InvestmentStatus @default(PENDING)
+  txHash          String?          @unique // On-chain or Payment ref
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  investor        Investor         @relation(fields: [investorId], references: [id])
+  campaign        Campaign         @relation(fields: [campaignId], references: [id])
+  escrow          EscrowTransaction?
+
+  @@index([investorId, campaignId])
+  @@index([status])
+}
+
+model EscrowTransaction {
+  id              String   @id @default(uuid())
+  investmentId    String   @unique
+  escrowAddress   String
+  status          String   // LOCKED, RELEASED, REFUNDED
+  releaseDate     DateTime?
+  createdAt       DateTime @default(now())
+
+  investment      Investment @relation(fields: [investmentId], references: [id])
+
+  // Immutability: Update/Delete should be blocked by application and DB rules
+}
+
+model Document {
+  id          String       @id @default(uuid())
+  userId      String?
+  campaignId  String?
+  type        DocumentType
+  title       String
+  url         String
+  mimeType    String
+  fileSize    Int
+  metadata    Json?
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?    // Soft Delete
+
+  user        User?        @relation(fields: [userId], references: [id])
+  campaign    Campaign?    @relation(fields: [campaignId], references: [id])
+
+  @@index([userId])
+  @@index([campaignId])
+  @@index([deletedAt])
+}
+
+model WatchlistItem {
+  id          String   @id @default(uuid())
+  investorId  String
+  campaignId  String
+  createdAt   DateTime @default(now())
+
+  investor    Investor @relation(fields: [investorId], references: [id])
+  campaign    Campaign @relation(fields: [campaignId], references: [id])
+
+  @@unique([investorId, campaignId])
+}
+
+model Notification {
+  id          String              @id @default(uuid())
+  userId      String
+  title       String
+  message     String
+  level       NotificationLevel   @default(INFO)
+  channels    NotificationChannel[]
+  isRead      Boolean             @default(false)
+  metadata    Json?
+  createdAt   DateTime            @default(now())
+
+  user        User                @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+}
+
+model ComplianceRecord {
+  id              String   @id @default(uuid())
+  targetId        String   // User ID or Campaign ID
+  targetType      String   // USER, CAMPAIGN
+  type            String   // KYC, KYB, AML, SANCTION
+  status          KycStatus
+  result          Json     // Marked as "to be encrypted"
+  traceId         String?
+  createdAt       DateTime @default(now())
+
+  @@index([targetId])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  action      String   // CREATE, UPDATE, DELETE, LOGIN
+  entity      String   // Investment, Campaign, etc.
+  entityId    String
+  changes     Json?    // delta
+  traceId     String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([traceId])
+  // Immutability: Blocked by app/DB rules
+enum UserRole {
+  investor
+  founder
+  admin
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  investor  Investor?
+  founder   Founder?
+}
+
+model Investor {
+  id                  String   @id @default(uuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id])
+  firstName           String
+  lastName            String
+  accreditationStatus Boolean  @default(false)
+  preferences         Json?    // InvestorPreferences
+  investments         Investment[]
+}
+
+model Founder {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  firstName   String
+  lastName    String
+  companyName String
+  linkedinUrl String?
+  campaigns   Campaign[]
+}
+
+enum CampaignStatus {
+  draft
+  published
+  funded
+  closed
+}
+
+enum CampaignStage {
+  seed
+  series_a
+  series_b
+  growth
+}
+
+model Campaign {
+  id           String         @id @default(uuid())
+  founderId    String
+  founder      Founder        @relation(fields: [founderId], references: [id])
+  title        String
+  description  String
+  targetAmount Decimal        @db.Decimal(20, 2)
+  raisedAmount Decimal        @db.Decimal(20, 2) @default(0)
+  status       CampaignStatus @default(draft)
+  sector       String
+  stage        CampaignStage
+  location     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  documents    CampaignDocument[]
+  investments  Investment[]
+}
+
+model CampaignDocument {
+  id         String   @id @default(uuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  name       String
+  url        String
+  type       String
+  createdAt  DateTime @default(now())
+}
+
+model Investment {
+  id         String   @id @default(uuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  investorId String
+  investor   Investor @relation(fields: [investorId], references: [id])
+  amount     Decimal  @db.Decimal(20, 2)
+  currency   String   @default("USD")
+  status     String   @default("pending") // pending, confirmed, failed
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model KycRecord {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  status     String   // pending, approved, rejected
+  data       Json?
+  updatedAt  DateTime @updatedAt
+}
