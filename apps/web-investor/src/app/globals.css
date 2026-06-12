@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base styles already handled by tailwind theme and layout font variables */
+  }
+
+  body {
+    @apply selection:bg-accent-primary selection:text-white;
+  }
+}
+
+@layer components {
+  /* Global component overrides if needed */
+}
