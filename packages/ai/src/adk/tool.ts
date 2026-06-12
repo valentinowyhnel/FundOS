@@ -2,6 +2,7 @@ import type { ZodSchema } from 'zod';
 
 export interface ToolContext {
   logger?: any;
+  traceId?: string;
   [key: string]: any;
 }
 

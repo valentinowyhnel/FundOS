@@ -1,9 +1,11 @@
 import { createGeminiClient } from './gemini.js';
 import type { AdkAgent } from './agent.js';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import pRetry from 'p-retry';
 
 export interface RunContext {
   sessionId?: string;
+  traceId?: string;
   [key: string]: any;
 }
 
@@ -52,7 +54,19 @@ export async function runAgent(agent: AdkAgent, input: string, ctx?: RunContext)
       const tool = agent.tools.find(t => t.name === tc.functionCall!.name);
       if (!tool) throw new Error(`Tool ${tc.functionCall!.name} not found`);
 
-      const callResult = await tool.handler(tc.functionCall!.args, { ...ctx });
+      const callResult = await pRetry(
+        () => {
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error(`Tool ${tool.name} timed out after ${tool.timeout}ms`)), tool.timeout)
+          );
+          return Promise.race([
+            tool.handler(tc.functionCall!.args, { ...ctx }),
+            timeoutPromise
+          ]);
+        },
+        { retries: tool.retries }
+      );
+
       return {
         functionResponse: {
           name: tool.name,

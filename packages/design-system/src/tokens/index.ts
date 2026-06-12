@@ -1,8 +1,9 @@
-export * from './colors';
-export * from './typography';
-export * from './spacing';
-export * from './radius';
-export * from './shadows';
-export * from './motion';
-export * from './breakpoints';
-export * from './z-index';
+/**
+ * FundOS Design System – Token barrel export
+ */
+export * from './colors'
+export * from './typography'
+export * from './spacing'
+export * from './radius'
+export * from './shadows'
+export * from './motion'

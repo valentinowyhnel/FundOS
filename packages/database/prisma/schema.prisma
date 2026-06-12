@@ -14,35 +14,38 @@ enum UserRole {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  role      UserRole
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  investor  Investor?
-  founder   Founder?
+  id            String         @id @default(uuid())
+  email         String         @unique
+  role          UserRole
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  investor      Investor?
+  founder       Founder?
+  notifications Notification[]
+  kycRecord     KycRecord?
 }
 
 model Investor {
-  id                  String   @id @default(uuid())
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id])
+  id                  String       @id @default(uuid())
+  userId              String       @unique
+  user                User         @relation(fields: [userId], references: [id])
   firstName           String
   lastName            String
-  accreditationStatus Boolean  @default(false)
-  preferences         Json?    // InvestorPreferences
+  accreditationStatus Boolean      @default(false)
+  preferences         Json? // InvestorPreferences
   investments         Investment[]
 }
 
 model Founder {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id])
+  id          String     @id @default(uuid())
+  userId      String     @unique
+  user        User       @relation(fields: [userId], references: [id])
   firstName   String
   lastName    String
   companyName String
   linkedinUrl String?
   campaigns   Campaign[]
+  kybRecord   KybRecord?
 }
 
 enum CampaignStatus {
@@ -60,21 +63,25 @@ enum CampaignStage {
 }
 
 model Campaign {
-  id           String         @id @default(uuid())
-  founderId    String
-  founder      Founder        @relation(fields: [founderId], references: [id])
-  title        String
-  description  String
-  targetAmount Decimal        @db.Decimal(20, 2)
-  raisedAmount Decimal        @db.Decimal(20, 2) @default(0)
-  status       CampaignStatus @default(draft)
-  sector       String
-  stage        CampaignStage
-  location     String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  documents    CampaignDocument[]
-  investments  Investment[]
+  id                   String             @id @default(uuid())
+  founderId            String
+  founder              Founder            @relation(fields: [founderId], references: [id])
+  title                String
+  description          String
+  targetAmount         Decimal            @db.Decimal(20, 2)
+  raisedAmount         Decimal            @db.Decimal(20, 2) @default(0)
+  status               CampaignStatus     @default(draft)
+  sector               String
+  stage                CampaignStage
+  location             String
+  confidenceScore      Int?               @default(0)
+  confidenceBand       String? // strong, moderate, weak
+  dataLastIngestedAt   DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  documents            CampaignDocument[]
+  investments          Investment[]
+  scoreHistory         ScoreHistory[]
 }
 
 model CampaignDocument {
@@ -101,9 +108,58 @@ model Investment {
 }
 
 model KycRecord {
-  id         String   @id @default(uuid())
-  userId     String   @unique
-  status     String   // pending, approved, rejected
-  data       Json?
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  status    String // pending, approved, rejected
+  data      Json?
+  updatedAt DateTime @updatedAt
+}
+
+model KybRecord {
+  id        String   @id @default(uuid())
+  founderId String   @unique
+  founder   Founder  @relation(fields: [founderId], references: [id])
+  status    String // pending, approved, rejected
+  data      Json?
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String // info, warning, critical
+  priority  String // HIGH, MED, LOW
+  category  String // pricing, cost, funding, compliance, strategy
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  agentName    String
+  agentVersion String
+  taskId       String
+  campaignId   String?
+  investorId   String?
+  action       String
+  status       String // success, failure
+  durationMs   Int
+  payload      Json?
+  error        String?
+  timestamp    DateTime @default(now())
+}
+
+model ScoreHistory {
+  id           String   @id @default(uuid())
+  campaignId   String
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  score        Int
+  dimensions   Json // financial, traction, team, compliance, market
+  changeReason String
+  scoredBy     String // agent-version
+  timestamp    DateTime @default(now())
 }

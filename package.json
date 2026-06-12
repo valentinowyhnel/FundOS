@@ -16,10 +16,7 @@
     "format": "biome check --write .",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
     "clean": "turbo run clean",
-    "prepare": "husky",
-    "agents:build": "turbo run build --filter=\"@fundos/agent-*\"",
-    "agents:test": "turbo run test --filter=\"@fundos/agent-*\"",
-    "agents:typecheck": "turbo run typecheck --filter=\"@fundos/agent-*\""
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

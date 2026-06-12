@@ -1,15 +1,14 @@
 /**
  * FundOS Design System – Shadow Tokens
- * Source of truth: FRONTEND_DESIGN_SYSTEM.md § Shadows & Depth
+ * Source of truth: FRONTEND_DESIGN_SYSTEM.md § Design Tokens
  *
- * All shadows use #0F1728 (text-primary) with specified opacities.
+ * Warm-neutral tinted shadows matched to surface palette.
  */
-const shadowColor = '#0F1728';
-
 export const shadows = {
-  none: 'none',
-  subtle: `0px 1px 4px 0px rgba(15, 23, 40, 0.04)`,
-  small: `0px 2px 8px 0px rgba(15, 23, 40, 0.06)`,
-  medium: `0px 4px 12px 0px rgba(15, 23, 40, 0.08)`,
-  large: `0px 8px 16px 0px rgba(15, 23, 40, 0.12)`,
-} as const;
+  xs:  '0 1px 2px rgba(16, 24, 40, 0.05)',
+  sm:  '0 1px 3px rgba(16, 24, 40, 0.10), 0 1px 2px rgba(16, 24, 40, 0.06)',
+  md:  '0 4px 8px rgba(16, 24, 40, 0.08), 0 2px 4px rgba(16, 24, 40, 0.04)',
+  lg:  '0 12px 24px rgba(16, 24, 40, 0.08), 0 4px 8px rgba(16, 24, 40, 0.04)',
+  xl:  '0 24px 48px rgba(16, 24, 40, 0.12), 0 8px 16px rgba(16, 24, 40, 0.06)',
+  inner: 'inset 0 2px 4px rgba(16, 24, 40, 0.06)',
+} as const

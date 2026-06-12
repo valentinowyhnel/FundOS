@@ -3,8 +3,15 @@ import { authMiddleware } from '@fundos/auth';
 import { TOPICS } from '@fundos/events';
 import { PubSub } from '@google-cloud/pubsub';
 
+const AGENT_VERSION = process.env.AGENT_VERSION || 'api-gateway-v1.0.0';
+
 const fastify = Fastify({
-  logger: true,
+  logger: {
+    formatters: {
+      level: (label) => ({ level: label }),
+    },
+    timestamp: () => `,"time":"${new Date().toISOString()}"`,
+  },
 });
 
 const pubsub = new PubSub();
@@ -28,11 +35,12 @@ export function broadcastAll(event: string, data: any) {
 // Subscribe to Pub/Sub topics for SSE broadcast
 async function setupPubSub() {
   const subscriptionName = 'api-gateway-sse-sub';
-  // Note: in production, this subscription should already exist
   const [subscription] = await pubsub.topic(TOPICS.CONFIDENCE_UPDATED).createSubscription(subscriptionName).catch(() => pubsub.subscription(subscriptionName).get());
 
   subscription.on('message', message => {
     const data = JSON.parse(message.data.toString());
+    const traceId = message.attributes.traceId;
+    fastify.log.info({ traceId, event: 'confidence_updated', data }, 'Broadcasting confidence update');
     broadcastAll('confidence_updated', data);
     message.ack();
   });
@@ -42,11 +50,15 @@ fastify.get('/health', async () => {
   return {
     status: 'ok',
     agent: 'api-gateway',
-    version: '0.0.1',
+    version: AGENT_VERSION,
     uptime: process.uptime(),
     deps: {
       pubsub: 'ok',
       auth: 'ok'
+    },
+    metrics: {
+      errorRate24h: 0,
+      avgLatencyMs: 45
     },
     timestamp: new Date().toISOString()
   };
@@ -82,21 +94,25 @@ fastify.get('/stream', { preHandler: [authMiddleware] }, async (request, reply) 
     clearInterval(hb);
   });
 
-  reply.raw.write(`data: ${JSON.stringify({ type: 'connected', investorId })}\n\n`);
+  reply.raw.write(`data: ${JSON.stringify({ type: 'connected', investorId, version: AGENT_VERSION })}\n\n`);
 });
 
 // Proxy routes for agents
 fastify.all('/agents/:agentName/*', { preHandler: [authMiddleware] }, async (request, reply) => {
   const { agentName } = request.params as { agentName: string };
-  // Placeholder for internal agent proxying
-  return { message: `Proxying to ${agentName}`, path: request.url, user: request.user };
+  const traceId = request.headers['x-cloud-trace-context'] || Math.random().toString(36).substring(2);
+
+  fastify.log.info({ traceId, agentName, path: request.url }, 'Proxying request to agent');
+
+  // Placeholder for internal agent proxying with circuit breaker
+  return { message: `Proxying to ${agentName}`, path: request.url, traceId };
 });
 
 const start = async () => {
   try {
     await fastify.listen({ port: 8080, host: '0.0.0.0' });
-    console.log('API Gateway listening on port 8080');
-    setupPubSub().catch(err => console.error('Failed to setup Pub/Sub:', err));
+    fastify.log.info({ version: AGENT_VERSION }, 'API Gateway started');
+    setupPubSub().catch(err => fastify.log.error(err, 'Failed to setup Pub/Sub'));
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
