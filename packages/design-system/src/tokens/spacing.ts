@@ -1,22 +1,21 @@
 /**
- * FundOS Design System – Spacing Tokens (4px base unit)
- * Source of truth: FRONTEND_DESIGN_SYSTEM.md § Spacing
+ * FundOS Design System – Spacing Tokens
+ * Source of truth: FRONTEND_DESIGN_SYSTEM.md § Spacing & Rhythm
  */
 export const spacing = {
-  0:  '0',
-  0.5:'0.125rem', // 2px
-  1:  '0.25rem',  // 4px
-  1.5:'0.375rem', // 6px
-  2:  '0.5rem',   // 8px
-  3:  '0.75rem',  // 12px
-  4:  '1rem',     // 16px
-  5:  '1.25rem',  // 20px
-  6:  '1.5rem',   // 24px
-  8:  '2rem',     // 32px
-  10: '2.5rem',   // 40px
-  12: '3rem',     // 48px
-  16: '4rem',     // 64px
-  20: '5rem',     // 80px
-  24: '6rem',     // 96px
-  32: '8rem',     // 128px
-} as const
+  0: '0px',
+  2: '2px',
+  4: '4px',
+  8: '8px',
+  12: '12px',
+  16: '16px',
+  20: '20px',
+  24: '24px',
+  32: '32px',
+  40: '40px',
+  48: '48px',
+  64: '64px',
+  80: '80px',
+  96: '96px',
+  128: '128px',
+} as const;

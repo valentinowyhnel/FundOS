@@ -3,3 +3,8 @@ export * from './schemas/ingestion.events.js';
 export * from './schemas/scoring.events.js';
 export * from './schemas/confidence.events.js';
 export * from './schemas/settlement.events.js';
+export * from './topics';
+export * from './envelope';
+export * from './schemas/confidence.events';
+export * from './schemas/scoring.events';
+export * from './schemas/settlement.events';
