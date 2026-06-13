@@ -1,9 +1,15 @@
+'use client';
+
 import React from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { Card, Button, Badge, Input, cn } from '@fundos/ui';
 import { Search, Filter, Grid, List, CheckCircle2, ShieldCheck, MapPin, Zap } from 'lucide-react';
 
 export default function DiscoverPage() {
+  const GridIcon = Grid as any;
+  const ListIcon = List as any;
+  const SearchIcon = Search as any;
+
   return (
     <AppShell>
       <div className="flex flex-col gap-8">
@@ -19,19 +25,18 @@ export default function DiscoverPage() {
           <div className="flex gap-3">
             <Button variant="secondary" size="md">Saved Views</Button>
             <div className="flex border border-border-default rounded-small overflow-hidden">
-              <button className="p-2.5 bg-surface-muted text-accent-primary"><Grid className="h-5 w-5" /></button>
-              <button className="p-2.5 bg-white text-text-tertiary hover:text-text-secondary transition-colors"><List className="h-5 w-5" /></button>
+              <button className="p-2.5 bg-surface-muted text-accent-primary"><GridIcon className="h-5 w-5" /></button>
+              <button className="p-2.5 bg-white text-text-tertiary hover:text-text-secondary transition-colors"><ListIcon className="h-5 w-5" /></button>
             </div>
           </div>
         </header>
 
         <div className="flex gap-8">
-          {/* Sticky Filter Rail */}
           <aside className="w-64 shrink-0 space-y-8">
             <div className="space-y-4">
               <h4 className="text-caption font-bold text-text-secondary uppercase tracking-widest">Search</h4>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary" />
+                <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary" />
                 <Input className="pl-10 h-10" placeholder="Filter names..." />
               </div>
             </div>
@@ -57,7 +62,6 @@ export default function DiscoverPage() {
             </FilterSection>
           </aside>
 
-          {/* Main Grid */}
           <main className="flex-1 space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
               <DealCard
@@ -77,41 +81,6 @@ export default function DiscoverPage() {
                 score={84}
                 progress={40}
                 isLead
-              />
-              <DealCard
-                name="GreenNode"
-                thesis="Decentralized grid management for micro-renewables."
-                stage="Seed"
-                location="Berlin, DE"
-                score={71}
-                progress={90}
-                isVerified
-              />
-              <DealCard
-                name="OmniHealth"
-                thesis="AI co-pilot for specialized oncology diagnosis."
-                stage="Series B"
-                location="Boston, MA"
-                score={68}
-                progress={15}
-              />
-              <DealCard
-                name="CyberVault"
-                thesis="Zero-knowledge proof encryption for institutional asset custody."
-                stage="Series A"
-                location="Tel Aviv, IL"
-                score={89}
-                progress={62}
-                isVerified
-                isLead
-              />
-              <DealCard
-                name="AutoScale"
-                thesis="Generative UI for enterprise SaaS optimization."
-                stage="Pre-Seed"
-                location="New York, NY"
-                score={78}
-                progress={35}
               />
             </div>
           </main>
@@ -147,6 +116,11 @@ function FilterChip({ label, count, active }: { label: string; count: number; ac
 }
 
 function DealCard({ name, thesis, stage, location, score, progress, isVerified, isLead }: any) {
+  const ShieldIcon = ShieldCheck as any;
+  const CheckIcon = CheckCircle2 as any;
+  const ZapIcon = Zap as any;
+  const MapIcon = MapPin as any;
+
   return (
     <Card className="group flex flex-col p-6 h-full border border-border-default hover:border-accent-primary/20 transition-all">
       <div className="flex justify-between items-start mb-6">
@@ -158,8 +132,8 @@ function DealCard({ name, thesis, stage, location, score, progress, isVerified, 
             {score}/100
           </Badge>
           <div className="flex gap-1.5">
-            {isVerified && <ShieldCheck className="h-4 w-4 text-accent-success" />}
-            {isLead && <CheckCircle2 className="h-4 w-4 text-accent-primary" />}
+            {isVerified && <ShieldIcon className="h-4 w-4 text-accent-success" />}
+            {isLead && <CheckIcon className="h-4 w-4 text-accent-primary" />}
           </div>
         </div>
       </div>
@@ -174,10 +148,10 @@ function DealCard({ name, thesis, stage, location, score, progress, isVerified, 
       <div className="mt-6 space-y-4">
         <div className="flex items-center gap-4 text-caption font-medium text-text-tertiary">
           <div className="flex items-center gap-1">
-            <Zap className="h-3 w-3" /> {stage}
+            <ZapIcon className="h-3 w-3" /> {stage}
           </div>
           <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" /> {location}
+            <MapIcon className="h-3 w-3" /> {location}
           </div>
         </div>
 

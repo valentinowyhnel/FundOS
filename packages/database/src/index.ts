@@ -5,7 +5,7 @@ import { auditLogExtension, traceStorage, extractTraceId } from './middleware/au
 const basePrisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL,
+      url: process.env.DATABASE_URL as string,
     },
   },
 });
@@ -13,7 +13,7 @@ const basePrisma = new PrismaClient({
 const basePrismaReadonly = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_REPLICA_URL || process.env.DATABASE_URL,
+      url: (process.env.DATABASE_REPLICA_URL || process.env.DATABASE_URL) as string,
     },
   },
 });

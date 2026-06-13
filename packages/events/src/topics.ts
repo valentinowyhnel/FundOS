@@ -11,9 +11,6 @@ export const TOPICS = {
   KYC_UPDATED: 'fundos.kyc.updated',
   MATCHES_UPDATED: 'fundos.matches.updated',
   PROFILE_UPDATED: 'fundos.profile.updated',
-} as const;
-
-export type TopicName = typeof TOPICS[keyof typeof TOPICS];
   PROJECT_INGESTED: 'project.ingested',
   PROJECT_MARKET_RESEARCH_COMPLETED: 'project.market-research.completed',
   PROJECT_SCORE_UPDATED: 'project.score.updated',
@@ -23,4 +20,5 @@ export type TopicName = typeof TOPICS[keyof typeof TOPICS];
   INVESTOR_RECOMMENDATIONS_UPDATED: 'investor.recommendations.updated',
 } as const;
 
-export type Topic = typeof TOPICS[keyof typeof TOPICS];
+export type TopicName = typeof TOPICS[keyof typeof TOPICS];
+export type Topic = TopicName;
