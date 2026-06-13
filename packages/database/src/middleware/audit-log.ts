@@ -9,6 +9,7 @@ export const traceStorage = new AsyncLocalStorage<{ traceId: string }>();
 export function extractTraceId(header: string | undefined | string[]): string | undefined {
   if (!header) return undefined;
   const h = Array.isArray(header) ? header[0] : header;
+  if (!h) return undefined;
   return h.split('/')[0];
 }
 
@@ -46,14 +47,14 @@ export const auditLogExtension = Prisma.defineExtension({
 
           try {
             // Determine action name
-            let action = operation.toUpperCase();
+            const action = operation.toUpperCase();
 
             // Entity ID determination (simplified)
             let entityId = 'N/A';
             if (result && typeof result === 'object' && 'id' in result) {
-              entityId = result.id;
-            } else if (args.where && args.where.id) {
-              entityId = args.where.id;
+              entityId = String(result.id);
+            } else if ((args as any).where && (args as any).where.id) {
+              entityId = String((args as any).where.id);
             }
 
             // Create Audit Log entry
@@ -64,7 +65,7 @@ export const auditLogExtension = Prisma.defineExtension({
                 entity: model,
                 entityId,
                 traceId: traceId || null,
-                changes: args.data || args.update || null,
+                changes: (args as any).data || (args as any).update || null,
               }
             });
           } catch (auditError) {

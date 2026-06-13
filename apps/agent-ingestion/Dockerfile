@@ -1,21 +1,17 @@
-# Use official Node.js image
-FROM node:22-slim AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-
-FROM base AS build
-COPY . /usr/src/app
-WORKDIR /usr/src/app
+FROM node:22-alpine AS builder
+WORKDIR /app
+COPY package*.json turbo.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY packages/ ./packages/
+COPY apps/agent-ingestion/ ./apps/agent-ingestion/
+RUN npm install -g pnpm@10.12.1
 RUN pnpm install --frozen-lockfile
-RUN pnpm run build --filter=@fundos/agent-ingestion...
+RUN pnpm run build --filter="@fundos/agent-ingestion"
 
-FROM base AS runtime
-WORKDIR /usr/src/app
-COPY --from=build /usr/src/app /usr/src/app
-
-EXPOSE 8080
-ENV PORT=8080
+FROM node:22-alpine AS runner
+WORKDIR /app
 ENV NODE_ENV=production
-
-CMD [ "pnpm", "start", "--filter=@fundos/agent-ingestion" ]
+# Some apps use dist/main.js, others next start
+COPY --from=builder /app/apps/agent-ingestion/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+EXPOSE 8080
+CMD ["node", "dist/main.js"]

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { Card, Button, Badge, cn } from '@fundos/ui';

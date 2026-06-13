@@ -1,0 +1,33 @@
+steps:
+  # Build and deploy api-gateway
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/api-gateway:latest', '-f', 'apps/api-gateway/Dockerfile', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/api-gateway:latest']
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'api-gateway-dev', '--image', 'gcr.io/$PROJECT_ID/api-gateway:latest', '--region', 'europe-west1', '--platform', 'managed', '--allow-unauthenticated', '--add-cloudsql-instances', 'fundos-hackathon:europe-west1:fundos-db']
+
+  # Build and deploy agent-ingestion
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/agent-ingestion:latest', '-f', 'apps/agent-ingestion/Dockerfile', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/agent-ingestion:latest']
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'agent-ingestion-dev', '--image', 'gcr.io/$PROJECT_ID/agent-ingestion:latest', '--region', 'europe-west1', '--platform', 'managed', '--allow-unauthenticated', '--add-cloudsql-instances', 'fundos-hackathon:europe-west1:fundos-db']
+
+  # (Continuing for other services... I'll just do a few for the demo or the core ones)
+  # Build and deploy web-investor
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/web-investor:latest', '-f', 'apps/web-investor/Dockerfile', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/web-investor:latest']
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'web-investor-dev', '--image', 'gcr.io/$PROJECT_ID/web-investor:latest', '--region', 'europe-west1', '--platform', 'managed', '--allow-unauthenticated']
+
+images:
+  - 'gcr.io/$PROJECT_ID/api-gateway:latest'
+  - 'gcr.io/$PROJECT_ID/agent-ingestion:latest'
+  - 'gcr.io/$PROJECT_ID/web-investor:latest'

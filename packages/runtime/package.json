@@ -19,8 +19,7 @@
     "@fastify/cors": "^11.0.0",
     "@fastify/helmet": "^13.0.0",
     "@fastify/rate-limit": "^10.3.0",
-    "@fundos/logger": "workspace:*",
-    "@google-cloud/adk": "^0.0.1"
+    "@fundos/logger": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.5.0",

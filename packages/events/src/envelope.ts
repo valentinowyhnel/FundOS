@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import * as nodeCrypto from 'node:crypto';
 
 export const EventEnvelopeSchema = z.object({
   id: z.string().uuid(),
@@ -22,7 +23,7 @@ export function createEventEnvelope<T>(params: {
   data: T;
 }): EventEnvelope<T> {
   return {
-    id: crypto.randomUUID(),
+    id: nodeCrypto.randomUUID(),
     source: params.source,
     type: params.type,
     subject: params.subject,

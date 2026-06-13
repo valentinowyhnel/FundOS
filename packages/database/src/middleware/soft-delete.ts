@@ -23,15 +23,15 @@ export const softDeleteExtension = Prisma.defineExtension({
 
         // --- Read Operations ---
         if (operation === 'findMany' || operation === 'findFirst' || operation === 'count') {
-          args.where = { ...args.where, deletedAt: null };
+          (args as any).where = { ...(args as any).where, deletedAt: null };
         }
 
         if (operation === 'findUnique') {
           // findUnique doesn't allow adding where: { deletedAt: null } because it requires unique fields.
           // We convert it to findFirst which does allow it.
           const findFirstResult = await (Prisma.getExtensionContext(this) as any).findFirst({
-            ...args,
-            where: { ...args.where, deletedAt: null },
+            ...(args as any),
+            where: { ...(args as any).where, deletedAt: null },
           });
           return findFirstResult;
         }
@@ -39,14 +39,14 @@ export const softDeleteExtension = Prisma.defineExtension({
         // --- Write Operations ---
         if (operation === 'delete') {
           return (Prisma.getExtensionContext(this) as any).update({
-            ...args,
+            ...(args as any),
             data: { deletedAt: new Date() },
           });
         }
 
         if (operation === 'deleteMany') {
           return (Prisma.getExtensionContext(this) as any).updateMany({
-            ...args,
+            ...(args as any),
             data: { deletedAt: new Date() },
           });
         }
